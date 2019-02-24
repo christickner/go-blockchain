@@ -27,3 +27,19 @@ func TestAddBlock(t *testing.T) {
 		t.Errorf("Unexpected Block data, got: %s", string(bc.blocks[1].Data))
 	}
 }
+
+func TestBlocks(t *testing.T) {
+	bc := NewBlockchain()
+
+	bc.AddBlock("block 2")
+
+	if len(bc.blocks) != 2 {
+		t.Errorf("Expected 2 Blocks, got: %d", bc.Blocks())
+	}
+
+	for i, b := range bc.Blocks() {
+		if b != bc.blocks[i] {
+			t.Errorf("Block at index %d is not expected", i)
+		}
+	}
+}
