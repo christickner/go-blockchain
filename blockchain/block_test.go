@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// NewBlock should generate a valid block with a Timestamp, Hash, and use the given Data nd PrevBlockHash
+// NewBlock should generate a valid block with a Timestamp, Hash, and use the given Data and PrevBlockHash
 func TestNewBlock(t *testing.T) {
 	b := NewBlock("some data", []byte{'1', '2'})
 
