@@ -24,3 +24,18 @@ func TestNewBlock(t *testing.T) {
 		t.Error("block hash was not set")
 	}
 }
+
+func TestSerialization(t *testing.T) {
+	b := NewBlock("new block", []byte{'1', '2'})
+	s := b.Serialize()
+
+	dBlock := DeserializeBlock(s)
+
+	if string(dBlock.Hash) != string(b.Hash) {
+		t.Errorf("wrong hash, got: %x, expected %x", dBlock.Hash, b.Hash)
+	}
+
+	if string(dBlock.Data) != "new block" {
+		t.Errorf("wrong data, got: %s, expected %s", b.Data, dBlock.Data)
+	}
+}
