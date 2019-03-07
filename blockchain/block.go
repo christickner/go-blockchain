@@ -30,6 +30,8 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 	block.Hash = hash[:]
 	block.Nonce = nonce
 
+	log.Printf("%x blockchain added new block with data \"%s\"", block.Hash, data)
+
 	return block
 }
 

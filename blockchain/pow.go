@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-const targetBits = 20
+const targetBits = 18
 const maxNonce = math.MaxInt64
 
 type ProofOfWork struct {
@@ -32,7 +32,7 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 	for nonce < maxNonce {
 		data := pow.prepareData(nonce)
 		hash = sha256.Sum256(data)
-		fmt.Printf("\rMining the block containing \"%s\": %x", pow.block.Data, hash)
+		fmt.Printf("\r%x Mining the block containing \"%s\"", hash, pow.block.Data)
 		hashInt.SetBytes(hash[:])
 
 		if hashInt.Cmp(pow.target) == -1 {
