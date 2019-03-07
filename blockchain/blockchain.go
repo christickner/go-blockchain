@@ -11,8 +11,7 @@ type Blockchain struct {
 }
 
 func (bc *Blockchain) CloseDb() {
-	if err := bc.db.Close(); err != nil {
-		log.Print("close ")
+	if err := bc.db.Close(); err != nil && err.Error() != "EOF" {
 		log.Fatal(err)
 	}
 }
@@ -36,11 +35,10 @@ func (bci *ChainIterator) Next() *Block {
 	bci.currentHash = block.PrevBlockHash
 
 	if err != nil {
-		log.Print("view ")
 		log.Fatal(err)
 	}
 
-	return nil
+	return block
 }
 
 func (bc *Blockchain) Iterator() *ChainIterator {
@@ -55,7 +53,6 @@ func NewBlockchain() *Blockchain {
 
 	db, err := bolt.Open(dbFile, 0600, nil)
 	if err != nil {
-		log.Print("could not open ")
 		log.Fatal(err)
 	}
 
@@ -64,22 +61,20 @@ func NewBlockchain() *Blockchain {
 
 		if b == nil {
 			genesisBlock := NewBlock("Genesis Block", []byte{})
+			log.Println("Creating new blockchain, because one does not exist...")
 
 			b, err := tx.CreateBucket([]byte(blocksBucket))
 			if err != nil {
-				log.Print("could not create bucket: ")
 				log.Fatal(err)
 			}
 
 			err = b.Put(genesisBlock.Hash, genesisBlock.Serialize())
 			if err != nil {
-				log.Printf("%x coult not PUT genesis hash\n ", genesisBlock.Hash)
 				log.Fatal(err)
 			}
 
 			err = b.Put([]byte("l"), genesisBlock.Hash)
 			if err != nil {
-				log.Printf("%x coult not PUT genesis L\n ", genesisBlock.Hash)
 				log.Fatal(err)
 			}
 
@@ -89,14 +84,11 @@ func NewBlockchain() *Blockchain {
 		}
 
 		if err != nil {
-			log.Print("unknown err: ")
 			log.Fatal(err)
 		}
 
 		return nil
 	})
-
-	log.Printf("%x created tip\n", tip)
 
 	if len(tip) == 0 {
 		log.Fatal("no tip, after just creating blockchain")
@@ -117,7 +109,6 @@ func (bc *Blockchain) AddBlock(data string) {
 		b := tx.Bucket([]byte(blocksBucket))
 		if b != nil {
 			lastHash = b.Get([]byte("l"))
-			log.Printf("%x = L, FOUND last hash when creating new block", lastHash)
 		}
 
 		return nil
@@ -130,29 +121,20 @@ func (bc *Blockchain) AddBlock(data string) {
 
 		err := b.Put(newBlock.Hash, newBlock.Serialize())
 		if err != nil {
-			log.Print("coult not put hash ")
 			log.Fatal(err)
 		}
-
-		log.Printf("%x put block\n", newBlock.Hash)
 
 		err = b.Put([]byte("l"), newBlock.Hash)
 		if err != nil {
-			log.Print("x ")
 			log.Fatal(err)
 		}
 
-		log.Printf("%x put l as\n", newBlock.Hash)
-
 		bc.Tip = newBlock.Hash
-
-		log.Printf("%x bc\n", bc.Tip)
 
 		return nil
 	})
 
 	if err != nil {
-		log.Print("n ")
 		log.Fatal(err)
 	}
 }

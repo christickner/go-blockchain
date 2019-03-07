@@ -22,13 +22,11 @@ func (cli *CLI) Run() {
 	case "add":
 		err := addBlockCmd.Parse(os.Args[2:])
 		if err != nil {
-			fmt.Print("yu ")
 			log.Fatal(err)
 		}
 	case "print":
 		err := printChainCmd.Parse(os.Args[2:])
 		if err != nil {
-			fmt.Print("yohb ")
 			log.Fatal(err)
 		}
 	default:
@@ -50,7 +48,6 @@ func (cli *CLI) Run() {
 
 func (cli *CLI) addBlock(data string) {
 	cli.bc.AddBlock(data)
-	log.Printf("%x Successfully added, new tip\n", cli.bc.Tip)
 }
 
 func (cli *CLI) printChain() {
@@ -59,27 +56,24 @@ func (cli *CLI) printChain() {
 	for h := 0; h < 10; h++ {
 		block := i.Next()
 
-		log.Printf("nexting: %d\n", h)
-
 		if block == nil {
-			fmt.Println("no next block: ")
 			break
 		}
 
-		log.Printf("%x: Prev. Hash\n", block.PrevBlockHash)
+		log.Printf("Prev: %x\n", block.PrevBlockHash)
 		log.Printf("Data: %s\n", block.Data)
 		log.Printf("Nonce: %d\n", block.Nonce)
-		log.Printf("%x: Hash\n", block.Hash)
+		log.Printf("Hash: %x\n", block.Hash)
 		fmt.Println()
 	}
 }
 
 func main() {
 	bc := blockchain.NewBlockchain()
+	defer bc.CloseDb()
 
 	cli := CLI{
 		bc: bc,
 	}
 	cli.Run()
-	bc.CloseDb()
 }
